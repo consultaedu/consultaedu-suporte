@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbz0ll4v-IGyc7Mq3LAxqckz4Gom3XzgKEM4XCFBVnO3sVAt34DK4vMcomXpCiTV5tFm1Q/exec";
+const API_URL = "https://consultaedu-api.marcosdalleprane2.workers.dev/suporte/criar";
 
 const telaCadastro = document.getElementById("telaCadastro");
 const telaPrincipal = document.getElementById("telaPrincipal");
@@ -101,10 +101,26 @@ btnChamar.addEventListener("click", () => {
   dados.append("acao", "criar_chamado");
 
   fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: dados
-  });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    professor: professor,
+    instituicao: instituicao,
+    problema: tipoProblema,
+    observacao: textoObservacao || "Sem observação"
+  })
+})
+.then(resposta => resposta.json())
+.then(resultado => {
+  console.log("Chamado criado:", resultado);
+
+  if (resultado.ok) {
+    localStorage.setItem("chamadoAtualLinha", resultado.linha);
+    localStorage.setItem("chamadoAtualStatus", resultado.status);
+  }
+});
 
   const agora = new Date();
   const hora = agora.toLocaleTimeString("pt-BR", {
