@@ -21,6 +21,8 @@ const textoBotao = document.getElementById("textoBotao");
 const msgStatus = document.getElementById("msgStatus");
 const ultimoChamado = document.getElementById("ultimoChamado");
 
+let intervaloStatus = null;
+
 function carregarCadastro() {
   const professorSalvo = localStorage.getItem("professor");
   const instituicaoSalva = localStorage.getItem("instituicao");
@@ -33,9 +35,7 @@ function carregarCadastro() {
     telaPrincipal.classList.remove("hidden");
 
     const ultimo = localStorage.getItem("ultimoChamado");
-    if (ultimo) {
-      ultimoChamado.textContent = ultimo;
-    }
+    if (ultimo) ultimoChamado.textContent = ultimo;
   } else {
     telaCadastro.classList.remove("hidden");
     telaPrincipal.classList.add("hidden");
@@ -82,9 +82,7 @@ btnChamar.addEventListener("click", () => {
 
   if (!confirmar) return;
 
-  if (navigator.vibrate) {
-    navigator.vibrate(200);
-  }
+  if (navigator.vibrate) navigator.vibrate(200);
 
   btnChamar.disabled = true;
   btnChamar.style.background = "linear-gradient(135deg,#9ca3af,#6b7280)";
@@ -94,72 +92,72 @@ btnChamar.addEventListener("click", () => {
   msgStatus.style.color = "#64748b";
   msgStatus.textContent = "Enviando chamado para o suporte...";
 
-  const dados = new URLSearchParams();
-  dados.append("professor", professor);
-  dados.append("instituicao", instituicao);
-  dados.append("problema", tipoProblema);
-  dados.append("observacao", textoObservacao || "Sem observação");
-  dados.append("acao", "criar_chamado");
-
   fetch(API_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    professor: professor,
-    instituicao: instituicao,
-    problema: tipoProblema,
-    observacao: textoObservacao || "Sem observação"
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      professor: professor,
+      instituicao: instituicao,
+      problema: tipoProblema,
+      observacao: textoObservacao || "Sem observação"
+    })
   })
-})
-.then(resposta => resposta.json())
-.then(resultado => {
-  console.log("Chamado criado:", resultado);
+    .then(resposta => resposta.json())
+    .then(resultado => {
+      console.log("Chamado criado:", resultado);
 
-  if (resultado.ok) {
-    localStorage.setItem("chamadoAtualLinha", resultado.linha);
-    localStorage.setItem("chamadoAtualStatus", resultado.status);
-  }
+      if (resultado.ok) {
+        localStorage.setItem("chamadoAtualLinha", resultado.linha);
+        localStorage.setItem("chamadoAtualStatus", resultado.status);
+
+        const agora = new Date();
+        const hora = agora.toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+        const textoUltimo = "Hoje às " + hora;
+        localStorage.setItem("ultimoChamado", textoUltimo);
+        ultimoChamado.textContent = textoUltimo;
+
+        iconeBotao.textContent = "✅";
+        textoBotao.textContent = "CHAMADO ENVIADO";
+
+        btnChamar.style.background =
+          "linear-gradient(135deg,#0b7f4f,#18b36b)";
+
+        msgStatus.style.color = "#d97706";
+        msgStatus.textContent = "🟡 Chamado enviado. Aguardando atendimento.";
+
+        observacao.value = "";
+
+        iniciarMonitoramentoChamado();
+
+        setTimeout(() => {
+          iconeBotao.textContent = "🚨";
+          textoBotao.textContent = "CHAMAR SUPORTE";
+
+          btnChamar.style.background =
+            "linear-gradient(135deg,#d93025,#ef4444)";
+
+          btnChamar.disabled = false;
+        }, 3000);
+      }
+    })
+    .catch(erro => {
+      console.log("Erro ao criar chamado:", erro);
+
+      iconeBotao.textContent = "⚠️";
+      textoBotao.textContent = "ERRO AO ENVIAR";
+
+      msgStatus.style.color = "#c62828";
+      msgStatus.textContent = "Não foi possível enviar o chamado.";
+
+      btnChamar.disabled = false;
+    });
 });
-
-  const agora = new Date();
-  const hora = agora.toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-
-  const textoUltimo = "Hoje às " + hora;
-  localStorage.setItem("ultimoChamado", textoUltimo);
-  ultimoChamado.textContent = textoUltimo;
-
-  setTimeout(() => {
-    iconeBotao.textContent = "✅";
-    textoBotao.textContent = "CHAMADO ENVIADO";
-
-    btnChamar.style.background =
-      "linear-gradient(135deg,#0b7f4f,#18b36b)";
-
-    msgStatus.style.color = "#0b7f4f";
-    msgStatus.textContent = "Chamado enviado! Aguarde o atendimento.";
-
-    observacao.value = "";
-  }, 900);
-
-  setTimeout(() => {
-    iconeBotao.textContent = "🚨";
-    textoBotao.textContent = "CHAMAR SUPORTE";
-
-    btnChamar.style.background =
-      "linear-gradient(135deg,#d93025,#ef4444)";
-
-    btnChamar.disabled = false;
-  }, 3500);
-});
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
 
 function iniciarMonitoramentoChamado() {
   const linha = localStorage.getItem("chamadoAtualLinha");
@@ -168,7 +166,11 @@ function iniciarMonitoramentoChamado() {
 
   consultarStatusChamado();
 
-  setInterval(consultarStatusChamado, 5000);
+  if (intervaloStatus) {
+    clearInterval(intervaloStatus);
+  }
+
+  intervaloStatus = setInterval(consultarStatusChamado, 5000);
 }
 
 function consultarStatusChamado() {
@@ -176,9 +178,11 @@ function consultarStatusChamado() {
 
   if (!linha) return;
 
-  fetch(`${STATUS_URL}?linha=${linha}`)
+  fetch(`${STATUS_URL}?linha=${linha}&t=${Date.now()}`)
     .then(resposta => resposta.json())
     .then(dados => {
+      console.log("Status do chamado:", dados);
+
       if (!dados.ok) return;
 
       if (dados.status === "AGUARDANDO") {
@@ -197,11 +201,20 @@ function consultarStatusChamado() {
 
         localStorage.removeItem("chamadoAtualLinha");
         localStorage.removeItem("chamadoAtualStatus");
+
+        if (intervaloStatus) {
+          clearInterval(intervaloStatus);
+          intervaloStatus = null;
+        }
       }
     })
-    .catch(() => {
-      console.log("Não foi possível consultar o status agora.");
+    .catch(erro => {
+      console.log("Erro ao consultar status:", erro);
     });
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
 }
 
 carregarCadastro();
