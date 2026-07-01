@@ -302,21 +302,28 @@ button {
   width: 100%;
   margin-top: 22px;
   border: none;
-  border-radius: 28px;
-  padding: 30px 18px;
+  border-radius: 24px;
+  padding: 20px 18px;
   background: linear-gradient(135deg, var(--red), var(--red-2));
   color: white;
-  font-size: 23px;
+  font-size: 20px;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 20px 45px rgba(217,48,37,0.35);
+  box-shadow: 0 16px 36px rgba(217,48,37,.35);
   animation: pulse 1.8s infinite;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  transition: .25s;
 }
 
 .sos-button span {
-  display: block;
-  font-size: 44px;
-  margin-bottom: 8px;
+    display: block;
+    font-size: 34px;
 }
 
 .sos-button:disabled {
