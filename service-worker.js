@@ -1,4 +1,4 @@
-const CACHE_NAME = "consultaedu-suporte-v15";
+const CACHE_NAME = "consultaedu-suporte-v16";
 
 const STATIC_FILES = [
   "./",
