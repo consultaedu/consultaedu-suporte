@@ -400,3 +400,18 @@ button {
     font-size: 30px;
   }
 }
+.spinner {
+  width: 34px;
+  height: 34px;
+  border: 4px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: girar .8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
