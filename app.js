@@ -79,16 +79,17 @@ btnChamar.addEventListener("click", () => {
     "Problema: " + tipoProblema
   );
 
-  if (!confirmar) {
-    return;
-  }
+  if (!confirmar) return;
 
   if (navigator.vibrate) {
     navigator.vibrate(200);
   }
 
   btnChamar.disabled = true;
-  btnChamar.innerHTML = "<span>⏳</span> ENVIANDO...";
+  btnChamar.style.background = "linear-gradient(135deg,#9ca3af,#6b7280)";
+  iconeBotao.innerHTML = '<div class="spinner"></div>';
+  textoBotao.textContent = "ENVIANDO...";
+
   msgStatus.style.color = "#64748b";
   msgStatus.textContent = "Enviando chamado para o suporte...";
 
@@ -99,36 +100,11 @@ btnChamar.addEventListener("click", () => {
   dados.append("observacao", textoObservacao || "Sem observação");
   dados.append("acao", "criar_chamado");
 
-  btnChamar.disabled = true;
-  iconeBotao.innerHTML = '<div class="spinner"></div>';
-  textoBotao.textContent = "ENVIANDO...";
-  
   fetch(API_URL, {
     method: "POST",
     mode: "no-cors",
     body: dados
   });
-
-  setTimeout(() => {
-  iconeBotao.textContent = "✅";
-  textoBotao.textContent = "CHAMADO ENVIADO";
-
-  btnChamar.style.background =
-    "linear-gradient(135deg,#0b7f4f,#18b36b)";
-
-  msgStatus.style.color = "#0b7f4f";
-  msgStatus.textContent = "Chamado enviado! Aguarde o atendimento.";
-  }, 900);
-
-  setTimeout(() => {
-  iconeBotao.textContent = "🚨";
-  textoBotao.textContent = "CHAMAR SUPORTE";
-
-  btnChamar.style.background =
-    "linear-gradient(135deg,#d93025,#ef4444)";
-
-  btnChamar.disabled = false;
-  }, 3200);
 
   const agora = new Date();
   const hora = agora.toLocaleTimeString("pt-BR", {
@@ -140,15 +116,28 @@ btnChamar.addEventListener("click", () => {
   localStorage.setItem("ultimoChamado", textoUltimo);
   ultimoChamado.textContent = textoUltimo;
 
-  msgStatus.style.color = "#006b3f";
-  msgStatus.textContent = "Chamado enviado! Aguarde o atendimento.";
+  setTimeout(() => {
+    iconeBotao.textContent = "✅";
+    textoBotao.textContent = "CHAMADO ENVIADO";
 
-  observacao.value = "";
+    btnChamar.style.background =
+      "linear-gradient(135deg,#0b7f4f,#18b36b)";
+
+    msgStatus.style.color = "#0b7f4f";
+    msgStatus.textContent = "Chamado enviado! Aguarde o atendimento.";
+
+    observacao.value = "";
+  }, 900);
 
   setTimeout(() => {
+    iconeBotao.textContent = "🚨";
+    textoBotao.textContent = "CHAMAR SUPORTE";
+
+    btnChamar.style.background =
+      "linear-gradient(135deg,#d93025,#ef4444)";
+
     btnChamar.disabled = false;
-    btnChamar.innerHTML = "<span>🚨</span> CHAMAR SUPORTE";
-  }, 6000);
+  }, 3500);
 });
 
 if ("serviceWorker" in navigator) {
