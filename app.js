@@ -1,4 +1,5 @@
 const API_URL = "https://consultaedu-api.marcosdalleprane2.workers.dev/suporte/criar";
+const STATUS_URL = "https://consultaedu-api.marcosdalleprane2.workers.dev/suporte/status";
 
 const telaCadastro = document.getElementById("telaCadastro");
 const telaPrincipal = document.getElementById("telaPrincipal");
@@ -160,4 +161,48 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
 
+function iniciarMonitoramentoChamado() {
+  const linha = localStorage.getItem("chamadoAtualLinha");
+
+  if (!linha) return;
+
+  consultarStatusChamado();
+
+  setInterval(consultarStatusChamado, 5000);
+}
+
+function consultarStatusChamado() {
+  const linha = localStorage.getItem("chamadoAtualLinha");
+
+  if (!linha) return;
+
+  fetch(`${STATUS_URL}?linha=${linha}`)
+    .then(resposta => resposta.json())
+    .then(dados => {
+      if (!dados.ok) return;
+
+      if (dados.status === "AGUARDANDO") {
+        msgStatus.style.color = "#d97706";
+        msgStatus.textContent = "🟡 Chamado enviado. Aguardando atendimento.";
+      }
+
+      if (dados.status === "EM ATENDIMENTO") {
+        msgStatus.style.color = "#0b7f4f";
+        msgStatus.textContent = `🟢 ${dados.atendente} está atendendo seu chamado.`;
+      }
+
+      if (dados.status === "FINALIZADO") {
+        msgStatus.style.color = "#0b7f4f";
+        msgStatus.textContent = "✅ Chamado finalizado.";
+
+        localStorage.removeItem("chamadoAtualLinha");
+        localStorage.removeItem("chamadoAtualStatus");
+      }
+    })
+    .catch(() => {
+      console.log("Não foi possível consultar o status agora.");
+    });
+}
+
 carregarCadastro();
+iniciarMonitoramentoChamado();
