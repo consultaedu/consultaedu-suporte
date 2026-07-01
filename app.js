@@ -15,6 +15,8 @@ const btnEditar = document.getElementById("btnEditar");
 const problema = document.getElementById("problema");
 const observacao = document.getElementById("observacao");
 const btnChamar = document.getElementById("btnChamar");
+const iconeBotao = document.getElementById("iconeBotao");
+const textoBotao = document.getElementById("textoBotao");
 const msgStatus = document.getElementById("msgStatus");
 const ultimoChamado = document.getElementById("ultimoChamado");
 
@@ -97,11 +99,36 @@ btnChamar.addEventListener("click", () => {
   dados.append("observacao", textoObservacao || "Sem observação");
   dados.append("acao", "criar_chamado");
 
+  btnChamar.disabled = true;
+  iconeBotao.innerHTML = '<div class="spinner"></div>';
+  textoBotao.textContent = "ENVIANDO...";
+  
   fetch(API_URL, {
     method: "POST",
     mode: "no-cors",
     body: dados
   });
+
+  setTimeout(() => {
+  iconeBotao.textContent = "✅";
+  textoBotao.textContent = "CHAMADO ENVIADO";
+
+  btnChamar.style.background =
+    "linear-gradient(135deg,#0b7f4f,#18b36b)";
+
+  msgStatus.style.color = "#0b7f4f";
+  msgStatus.textContent = "Chamado enviado! Aguarde o atendimento.";
+  }, 900);
+
+  setTimeout(() => {
+  iconeBotao.textContent = "🚨";
+  textoBotao.textContent = "CHAMAR SUPORTE";
+
+  btnChamar.style.background =
+    "linear-gradient(135deg,#d93025,#ef4444)";
+
+  btnChamar.disabled = false;
+  }, 3200);
 
   const agora = new Date();
   const hora = agora.toLocaleTimeString("pt-BR", {
