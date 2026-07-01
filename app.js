@@ -94,7 +94,7 @@ btnChamar.addEventListener("click", () => {
   dados.append("professor", professor);
   dados.append("instituicao", instituicao);
   dados.append("problema", tipoProblema);
-  dados.append("observacao", textoObservacao);
+  dados.append("observacao", textoObservacao || "Sem observação");
 
   fetch(API_URL, {
     method: "POST",
