@@ -1,1 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <title>ConsultaEdu Suporte</title>
+
+  <meta name="theme-color" content="#006b3f" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="page-bg"></div>
+
+  <main class="app">
+
+    <section id="telaCadastro" class="card">
+      <div class="logo-area">
+        <div class="logo">CE</div>
+        <h1>ConsultaEdu Suporte</h1>
+        <p>Configure seus dados uma única vez.</p>
+      </div>
+
+      <label>Nome do professor</label>
+      <input id="cadProfessor" type="text" placeholder="Digite seu nome completo" />
+
+      <label>Instituição</label>
+      <select id="cadInstituicao">
+        <option value="">Selecione</option>
+        <option value="UNIFAVENI">UNIFAVENI</option>
+        <option value="UNIABEU">UNIABEU</option>
+        <option value="UNISBA">UNISBA</option>
+      </select>
+
+      <button id="btnSalvarCadastro" class="btn-primary">Salvar dados</button>
+
+      <p id="msgCadastro" class="msg"></p>
+    </section>
+
+    <section id="telaPrincipal" class="card hidden">
+      <div class="top">
+        <div>
+          <span class="app-name">ConsultaEdu</span>
+          <h1>Suporte</h1>
+        </div>
+        <button id="btnEditar" class="btn-small">Editar</button>
+      </div>
+
+      <div class="professor-box">
+        <span>Professor</span>
+        <strong id="nomeProfessor"></strong>
+        <small id="instituicaoProfessor"></small>
+      </div>
+
+      <label>Tipo de problema</label>
+      <select id="problema">
+        <option value="Suporte solicitado">Suporte solicitado</option>
+        <option value="Problema no Google Meet">Problema no Google Meet</option>
+        <option value="Problema no Classroom">Problema no Classroom</option>
+        <option value="Alunos não conseguem acessar">Alunos não conseguem acessar</option>
+        <option value="Áudio ou câmera com problema">Áudio ou câmera com problema</option>
+        <option value="Outro problema">Outro problema</option>
+      </select>
+
+      <label>Observação opcional</label>
+      <textarea id="observacao" placeholder="Descreva rapidamente, se quiser..."></textarea>
+
+      <button id="btnChamar" class="sos-button">
+        <span>🚨</span>
+        CHAMAR SUPORTE
+      </button>
+
+      <p id="msgStatus" class="status"></p>
+
+      <div class="last-call">
+        <span>Último chamado</span>
+        <strong id="ultimoChamado">Nenhum chamado ainda</strong>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
