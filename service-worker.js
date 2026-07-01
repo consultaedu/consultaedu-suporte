@@ -1,4 +1,4 @@
-const CACHE_NAME = "consultaedu-suporte-v5";
+const CACHE_NAME = "consultaedu-suporte-v6";
 
 self.addEventListener("install", event => {
   self.skipWaiting();
