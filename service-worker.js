@@ -1,6 +1,6 @@
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open("consultaedu-suporte-v1").then(cache => {
+    caches.open("consultaedu-suporte-v3").then(cache => {
       return cache.addAll([
         "./",
         "./index.html",
